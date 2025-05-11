@@ -1,0 +1,13 @@
+[versions]
+jreleaser = "1.18.0"
+lombok = "1.18.38"
+sugar-next = "0.1.0-SNAPSHOT"
+hikariCP = "4.0.3"
+
+[plugins]
+jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
+
+[libraries]
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
+sugar-next = { group = "team.idealstate.sugar", name = "sugar-next", version.ref = "sugar-next" }
+hikariCP = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikariCP" }
