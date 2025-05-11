@@ -16,6 +16,7 @@
 
 package team.idealstate.sugar.next.boot.hikaricp;
 
+import team.idealstate.sugar.Sugar;
 import team.idealstate.sugar.next.database.DataSourceProvider;
 
-public interface NextHikariCP extends DataSourceProvider {}
+public interface NextHikariCP extends DataSourceProvider, Sugar {}
