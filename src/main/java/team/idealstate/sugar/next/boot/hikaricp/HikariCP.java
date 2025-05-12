@@ -32,13 +32,14 @@ import team.idealstate.sugar.next.context.annotation.feature.Named;
 import team.idealstate.sugar.next.context.aware.ContextAware;
 import team.idealstate.sugar.next.context.lifecycle.Destroyable;
 import team.idealstate.sugar.next.context.lifecycle.Initializable;
+import team.idealstate.sugar.next.database.DataSourceProvider;
 import team.idealstate.sugar.next.function.Lazy;
 import team.idealstate.sugar.validate.Validation;
 import team.idealstate.sugar.validate.annotation.NotNull;
 
 @Named("NextHikariCP")
 @Component
-public class HikariCP implements NextHikariCP, ContextAware, Initializable, Destroyable {
+public class HikariCP implements ContextAware, Initializable, Destroyable, DataSourceProvider {
     @NotNull
     @Override
     public DataSource getDataSource() {
@@ -49,12 +50,6 @@ public class HikariCP implements NextHikariCP, ContextAware, Initializable, Dest
     public void initialize() {
         this.lazyDataSource = lazy(() -> {
             HikariCPConfiguration configuration = getConfiguration();
-            Map<String, Object> properties = configuration.getProperties();
-            Object path = properties.get("path");
-            if (path instanceof String && ((String) path).startsWith(".")) {
-                String absolutePath = new File(getContext().getDataFolder(), (String) path).getAbsolutePath();
-                properties.put("path", absolutePath.replace("\\", "/"));
-            }
             HikariConfig hikariConfig = asHikariConfig(configuration);
             return new HikariDataSource(hikariConfig);
         });
@@ -76,16 +71,29 @@ public class HikariCP implements NextHikariCP, ContextAware, Initializable, Dest
     }
 
     @NotNull
-    private static HikariConfig asHikariConfig(HikariCPConfiguration configuration) {
+    private HikariConfig asHikariConfig(HikariCPConfiguration configuration) {
         Map<String, Object> properties = configuration.getProperties();
-        HikariConfig hikariConfig = new HikariConfig(
-                functional(new Properties()).apply(it -> it.putAll(properties)).it());
+        Map<String, Object> finalProperties = properties;
+        HikariConfig hikariConfig = new HikariConfig(functional(new Properties())
+                .apply(it -> it.putAll(finalProperties))
+                .it());
         hikariConfig.setDriverClassName(configuration.getDriver());
-        String url = configuration.getUrl();
-        for (Map.Entry<String, Object> entry : properties.entrySet()) {
-            url = url.replace("{" + entry.getKey() + "}", String.valueOf(entry.getValue()));
+        HikariCPConfiguration.Url url = configuration.getUrl();
+        String content = url.getContent();
+        properties = url.getProperties();
+        Object path = properties.get("path");
+        if (path instanceof String && ((String) path).startsWith(".")) {
+            String absolutePath = new File(getContext().getDataFolder(), (String) path)
+                    .toPath()
+                    .toAbsolutePath()
+                    .normalize()
+                    .toString();
+            properties.put("path", absolutePath.replace("\\", "/"));
         }
-        hikariConfig.setJdbcUrl(url);
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            content = content.replace("{" + entry.getKey() + "}", String.valueOf(entry.getValue()));
+        }
+        hikariConfig.setJdbcUrl(content);
         hikariConfig.setUsername(configuration.getUsername());
         hikariConfig.setPassword(configuration.getPassword());
         return hikariConfig;

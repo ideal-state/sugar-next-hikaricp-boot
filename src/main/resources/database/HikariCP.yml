@@ -1,12 +1,19 @@
 # HikariCP
 # 驱动类（完全限定名称）
 driver: org.h2.Driver
-# URL（可使用属性变量，格式为：{...}）
-url: jdbc:h2:file:{path};
+# 连接地址
+url:
+  # URL（可使用自定义属性变量，格式为：{...}）
+  content: jdbc:h2:file:{path};
+  # 自定义属性
+  properties:
+    # 名为 path 的属性可以是以 '.' 开头相对路径，
+    # 父路径为上下文的数据文件夹（Context#getDataFolder()）
+    path: ./h2
 # 用户名
 username: root
 # 密码
 password: ''
-# 属性
+# HikariCP 属性（详情请参阅：https://github.com/brettwooldridge/HikariCP）
 properties:
-  path: ./h2
+  maximumPoolSize: 10

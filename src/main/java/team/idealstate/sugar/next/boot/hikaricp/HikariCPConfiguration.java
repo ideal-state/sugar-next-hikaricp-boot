@@ -17,23 +17,19 @@
 package team.idealstate.sugar.next.boot.hikaricp;
 
 import java.util.Map;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import team.idealstate.sugar.next.context.annotation.component.Configuration;
 
 @Configuration(uri = "/database/HikariCP.yml", release = "bundled:/database/HikariCP.yml")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class HikariCPConfiguration {
 
     @NonNull
     private String driver;
 
     @NonNull
-    private String url;
+    private Url url;
 
     @NonNull
     private String username;
@@ -43,4 +39,13 @@ public class HikariCPConfiguration {
 
     @NonNull
     private Map<String, Object> properties;
+
+    @Data
+    public static class Url {
+        @NonNull
+        private String content;
+
+        @NonNull
+        private Map<String, Object> properties;
+    }
 }
