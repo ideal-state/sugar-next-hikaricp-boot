@@ -28,7 +28,6 @@ import javax.sql.DataSource;
 import team.idealstate.sugar.next.context.Context;
 import team.idealstate.sugar.next.context.annotation.component.Component;
 import team.idealstate.sugar.next.context.annotation.feature.Autowired;
-import team.idealstate.sugar.next.context.annotation.feature.Named;
 import team.idealstate.sugar.next.context.aware.ContextAware;
 import team.idealstate.sugar.next.context.lifecycle.Destroyable;
 import team.idealstate.sugar.next.context.lifecycle.Initializable;
@@ -37,7 +36,6 @@ import team.idealstate.sugar.next.function.Lazy;
 import team.idealstate.sugar.validate.Validation;
 import team.idealstate.sugar.validate.annotation.NotNull;
 
-@Named("NextHikariCP")
 @Component
 public class HikariCP implements ContextAware, Initializable, Destroyable, DataSourceProvider {
     @NotNull
